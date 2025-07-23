@@ -1,0 +1,247 @@
+[
+  {
+    "linea": "1",
+    "ramales": [
+      {
+        "cod": 5,
+        "descripcion": "Mitre",
+        "color": "#000999"
+      },
+      {
+        "cod": 6,
+        "descripcion": "Salta",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "3",
+    "ramales": [
+      {
+        "cod": 8,
+        "descripcion": "Lavalle",
+        "color": "#000999"
+      },
+      {
+        "cod": 9,
+        "descripcion": "Marcoz Paz",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "4",
+    "ramales": [
+      {
+        "cod": 11,
+        "descripcion": "Colombres",
+        "color": "#000999"
+      },
+      {
+        "cod": 12,
+        "descripcion": "Mercofrut",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "5",
+    "ramales": [
+      {
+        "cod": 14,
+        "descripcion": "25 de mayo",
+        "color": "#000999"
+      },
+      {
+        "cod": 16,
+        "descripcion": "Balcarce",
+        "color": "#000999"
+      },
+      {
+        "cod": 19,
+        "descripcion": "Agrimensor",
+        "color": "#000999"
+      },
+      {
+        "cod": 23,
+        "descripcion": "SEOC - El molino",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "6",
+    "ramales": [
+      {
+        "cod": 22,
+        "descripcion": "Crisóstomo Álvarez - Cangallo - Bº San Alberto",
+        "color": "#000999"
+      },
+      {
+        "cod": 39,
+        "descripcion": "San José - San Felipe (por Democracia)",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "7",
+    "ramales": [
+      {
+        "cod": 25,
+        "descripcion": "Villa Mariano Moreno - AGET",
+        "color": "#000999"
+      },
+      {
+        "cod": 31,
+        "descripcion": "Bº O Connors - Grúa (por Colombia)",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "8",
+    "ramales": [
+      {
+        "cod": 3,
+        "descripcion": "Vº Muñecas - Bº Kennedy",
+        "color": "#000999"
+      },
+      {
+        "cod": 4,
+        "descripcion": "El Bosque - Lola Mora",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "9",
+    "ramales": [
+      {
+        "cod": 10,
+        "descripcion": "Bulnes",
+        "color": "#000999"
+      },
+      {
+        "cod": 26,
+        "descripcion": "Viamonte",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "10",
+    "ramales": [
+      {
+        "cod": 33,
+        "descripcion": "Los Plátanos - Va. Amalia",
+        "color": "#000999"
+      },
+      {
+        "cod": 35,
+        "descripcion": "Los Plátanos - San Cayetano",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "11",
+    "ramales": [
+      {
+        "cod": 27,
+        "descripcion": "11 de Marzo",
+        "color": "#000999"
+      },
+      {
+        "cod": 32,
+        "descripcion": "Villa Angelina",
+        "color": "#000999"
+      },
+      {
+        "cod": 109,
+        "descripcion": "Manantial Sur",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "12",
+    "ramales": [
+      {
+        "cod": 18,
+        "descripcion": "Bº Municipal",
+        "color": "#000999"
+      },
+      {
+        "cod": 36,
+        "descripcion": "Bº SMATA",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "17",
+    "ramales": [
+      {
+        "cod": 28,
+        "descripcion": "Roca - Universidad (Rojo)",
+        "color": "#000999"
+      },
+      {
+        "cod": 29,
+        "descripcion": "Alem - Universidad (Verde)",
+        "color": "#000999"
+      },
+      {
+        "cod": 30,
+        "descripcion": "Terán - San Lorenzo (Azul)",
+        "color": "#000999"
+      },
+      {
+        "cod": 34,
+        "descripcion": "Terán - Roca (Naranja)",
+        "color": "#000999"
+      },
+      {
+        "cod": 101,
+        "descripcion": "Los Chañaritos",
+        "color": "#000999"
+      },
+      {
+        "cod": 110,
+        "descripcion": "Ejercito Argentino",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "18",
+    "ramales": [
+      {
+        "cod": 7,
+        "descripcion": "Sentido Antihorario",
+        "color": "#000999"
+      },
+      {
+        "cod": 13,
+        "descripcion": "Sentido Horario",
+        "color": "#000999"
+      }
+    ]
+  },
+  {
+    "linea": "19",
+    "ramales": [
+      {
+        "cod": 20,
+        "descripcion": "Sentido Horario",
+        "color": "#000999"
+      },
+      {
+        "cod": 21,
+        "descripcion": "Sentido Antihorario",
+        "color": "#000999"
+      }
+    ]
+  }
+]

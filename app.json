@@ -1,29 +1,55 @@
 {
   "expo": {
     "name": "suoon-app",
-    "slug": "suoon-app",
+    "slug": "suoon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.leo43.bustuc",
+      "config": {
+        "googleMapsApiKey": "AIzaSyDPxhTEbJxoLRMZ0BOp646s2-F9q8Sn7Q0"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "package": "com.leo43.bustuc",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDPxhTEbJxoLRMZ0BOp646s2-F9q8Sn7Q0"
+        }
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "cd435f60-02cc-423f-8e73-0add8c10a133"
+      },
+      "EXPO_PUBLIC_MAPBOX_API_TOKEN": "YOUR_MAPBOX_PUBLIC_ACCESS_TOKEN",
+      "EXPO_PUBLIC_GOOGLE_API_KEY": "AIzaSyDPxhTEbJxoLRMZ0BOp646s2-F9q8Sn7Q0"
+    },
+    "plugins": [
+      "expo-location"
+    ],
+    "owner": "leo43"
   }
 }

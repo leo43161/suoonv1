@@ -1,20 +1,23 @@
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { Provider } from 'react-redux';
+import { store, persistor } from './store/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import AppNavigator from './navigation/AppNavigator';
+
+// Habilitar el renderizador más reciente para react-native-maps
+import { enableLatestRenderer } from 'react-native-maps';
+enableLatestRenderer();
+
+// Polyfill para `crypto.randomUUID()` si se usa `expo-crypto` con algunas versiones de Node o entornos específicos
+import 'react-native-get-random-values';
+
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <PersistGate loading={<Text>Cargando...</Text>} persistor={persistor}>
+        <AppNavigator />
+      </PersistGate>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
