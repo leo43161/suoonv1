@@ -1,4 +1,5 @@
-import { StyleSheet, Platform, StatusBar, SafeAreaView, View } from 'react-native';
+import { StyleSheet, Platform, StatusBar, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
         flex: 1,
         // Ajuste del paddingTop para la barra de estado en Android.
         // `Platform.OS === 'android' ? StatusBar.currentHeight : 0` asegura que solo se aplique en Android.
-        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+        /* paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0, */
     },
     tabBar: {
         height: 70,

@@ -19,6 +19,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "expo": "~53.0.17",
     "expo-crypto": "^14.1.5",
+    "expo-dev-client": "~5.2.4",
     "expo-location": "^18.1.6",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
@@ -26,9 +27,10 @@
     "react-native-geolocation-service": "^5.3.1",
     "react-native-get-random-values": "^1.11.0",
     "react-native-maps": "^1.24.5",
+    "react-native-safe-area-context": "5.4.0",
     "react-redux": "^9.2.0",
     "redux-persist": "^6.0.0",
-    "expo-dev-client": "~5.2.4"
+    "react-native-screens": "~4.11.1"
   },
   "devDependencies": {
     "@babel/core": "^7.28.0",

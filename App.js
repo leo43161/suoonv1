@@ -5,8 +5,6 @@ import { PersistGate } from 'redux-persist/integration/react';
 import AppNavigator from './navigation/AppNavigator';
 
 // Habilitar el renderizador más reciente para react-native-maps
-import { enableLatestRenderer } from 'react-native-maps';
-enableLatestRenderer();
 
 // Polyfill para `crypto.randomUUID()` si se usa `expo-crypto` con algunas versiones de Node o entornos específicos
 import 'react-native-get-random-values';
