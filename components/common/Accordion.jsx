@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { colors } from '../../constants/colors';
+import { colors } from '../../global/colors';
 
 if (Platform.OS === 'android') {
     UIManager.setLayoutAnimationEnabledExperimental(true);

@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         paddingVertical: 12,
         borderRadius: 25,
-        backgroundColor: colors.light, // Puedes ajustar el color de fondo de la barra de búsqueda
+        backgroundColor: "#E4ECED", // Puedes ajustar el color de fondo de la barra de búsqueda
     },
     searchInputPlaceholder: {
         fontSize: 18,
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 10,
-        backgroundColor: colors.light, // Fondo del thumbnail
+        backgroundColor: "#E4ECED", // Fondo del thumbnail
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 10,

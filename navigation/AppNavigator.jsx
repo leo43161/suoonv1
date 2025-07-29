@@ -10,7 +10,7 @@ import BusStack from './BusStack';
 import LikesStack from './LikesStack';
 // import UserStack from './UserStack'; // Si se implementará la pantalla de usuario
 
-import { colors } from '../constants/colors'; // Ajustar ruta
+import { colors } from '../global/colors'; // Ajustar ruta
 
 const Tab = createBottomTabNavigator();
 
