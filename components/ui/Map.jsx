@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polyline, Marker } from 'react-native-maps';
-import colors from '../../global/colors';
+import {colors} from '../../global/colors';
 
 /**
  * Componente que renderiza el mapa y los elementos sobre él.

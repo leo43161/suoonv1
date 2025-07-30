@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Card from '../common/Card'; // Reutilizamos el componente Card
-import colors from '../../global/colors';
+import {colors} from '../../global/colors';
 
 /**
  * Tarjeta individual para un colectivo que coincide en la búsqueda.
