@@ -1,86 +1,117 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
-// Importamos los componentes de UI que creamos y actualizamos
+import { setOrigin, setDestination, setBusesCoords } from '../../features/map/mapSlice';
+import { useGetRecorridoByCoordsQuery } from '../../services/api/busesApi';
+
 import Map from '../../components/ui/Map';
 import BusesMatchedList from '../../components/ui/BusesMatchedList';
-// import { setOrigin, setDestination, setSelectedBus } from '../../features/map/mapSlice' // Futuro
+import { setBusSelected } from '../../features/buses/busesSlice';
 
-/**
- * Pantalla principal del mapa.
- * Contiene el mapa, la lista de colectivos que coinciden y los controles de UI.
- */
 const Maps = () => {
-  // const dispatch = useDispatch(); // Lo usaremos pronto
+  const dispatch = useDispatch();
+  const {
+    origin,
+    destination,
+    center,
+    zoom,
+    busesCoords
+  } = useSelector((state) => state.mapReducer);
+  
+  const { busSelected } = useSelector((state) => state.busesReducer);
 
-  // --- SIMULACIÓN DE DATOS (reemplazaremos esto con Selectors de Redux) ---
-  const initialRegion = {
-    latitude: -26.832222,
-    longitude: -65.221944,
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421,
-  };
+  const [matchedSegmentCoords, setMatchedSegmentCoords] = useState([]);
 
-  const origin = { latitude: -26.836, longitude: -65.222 };
-  const destination = { latitude: -26.825, longitude: -65.22 };
+  const {
+    data: matchedBuses, // 'data' se renombra a 'matchedBuses' para mayor claridad
+    error,
+    isLoading // ¡Obtenemos estados de carga y error gratis!
+  } = useGetRecorridoByCoordsQuery(
+    { origin, destination },
+    { skip: !origin || !destination } // No ejecuta la consulta si falta origen o destino
+  );
 
-  // Datos simulados de un recorrido completo y el tramo encontrado
-  const fullBusRoute = [
-    { latitude: -26.84, longitude: -65.23 },
-    { latitude: -26.836, longitude: -65.222 }, // Cerca del origen
-    { latitude: -26.83, longitude: -65.215 },
-    { latitude: -26.825, longitude: -65.22 }, // Cerca del destino
-    { latitude: -26.82, longitude: -65.225 },
-  ];
+  // --- EFECTO PARA SELECCIONAR EL PRIMER BUS POR DEFECTO ---
+  useEffect(() => {
+    // Si la búsqueda termina y hay resultados, pero no hay ningún bus seleccionado aún...
+    if (matchedBuses && matchedBuses.length > 0 && !busSelected) {
+      // ...seleccionamos el primer bus de la lista.
+      handleSelectBus(matchedBuses[0]);
+    }
+    // Si no hay resultados, limpiamos las rutas del mapa
+    else if (matchedBuses && matchedBuses.length === 0) {
+      dispatch(setBusesCoords([]));
+      dispatch(setBusSelected(null));
+    }
+  }, [matchedBuses, busSelected, dispatch]);
 
-  const matchedSegment = fullBusRoute.slice(1, 4); // El tramo entre los puntos cercanos
+  // --- EFECTO PARA CALCULAR EL SEGMENTO DEL RECORRIDO ---
+  useEffect(() => {
+    if (busSelected && busSelected.nodos && busSelected.startIndex !== -1) {
+      const segment = busSelected.nodos.slice(
+        busSelected.startIndex,
+        busSelected.endIndex + 1
+      );
+      setMatchedSegmentCoords(segment);
+    } else {
+      setMatchedSegmentCoords([]); // Limpiar si no hay bus seleccionado
+    }
+  }, [busSelected]);
 
-  // Datos simulados para la lista de colectivos encontrados
-  const matchedBuses = [
-    { cod: '10_A', linea: '10', descripcion: 'El Colmenar' },
-    { cod: '19_B', linea: '19', descripcion: 'B° Policial' },
-    { cod: '102_C', linea: '102', descripcion: 'Diagonal' },
-  ];
-  // --- FIN DE LA SIMULACIÓN ---
-
-
-  // --- Lógica para manejar eventos (futuramente despacharán acciones de Redux) ---
+  // --- MANEJADORES DE EVENTOS ---
   const handleOriginDragEnd = (coords) => {
-    console.log('Nuevo origen seleccionado:', coords);
-    // dispatch(setOrigin(coords));
+    dispatch(setOrigin(coords));
+    dispatch(setBusSelected(null)); 
   };
 
   const handleDestinationDragEnd = (coords) => {
-    console.log('Nuevo destino seleccionado:', coords);
-    // dispatch(setDestination(coords));
+    dispatch(setDestination(coords));
+    dispatch(setBusSelected(null));
   };
 
-  const handleSelectBus = (bus) => {
-    console.log('Colectivo seleccionado:', bus);
-    // dispatch(setSelectedBus(bus));
-  }
 
+  const handleSelectBus = (bus) => {
+    // 1. Informa al 'busesSlice' cuál es el bus seleccionado
+    dispatch(setBusSelected(bus));
+    // 2. Informa al 'mapSlice' cuáles son las coordenadas de la ruta COMPLETA a dibujar
+    dispatch(setBusesCoords(bus.nodos));
+  };
+
+  // Calcula la región del mapa dinámicamente
+  const region = {
+    latitude: center.latitude,
+    longitude: center.longitude,
+    latitudeDelta: 0.0922 / (2 ** (zoom - 12)), // Ajuste de delta por zoom
+    longitudeDelta: 0.0421 / (2 ** (zoom - 12)),
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.mapContainer}>
         <Map
-          initialRegion={initialRegion}
+          region={region}
           origin={origin}
           destination={destination}
+          fullRouteCoords={busesCoords}
+          matchedSegmentCoords={matchedSegmentCoords}
           onOriginDragEnd={handleOriginDragEnd}
           onDestinationDragEnd={handleDestinationDragEnd}
-          fullRouteCoords={fullBusRoute}
-          matchedSegmentCoords={matchedSegment}
         />
       </View>
 
       <View style={styles.busesListContainer}>
-        <BusesMatchedList
-            matchedBuses={matchedBuses}
+        {isLoading ? (
+          <ActivityIndicator size="large" color="#0000ff" />
+        ) : error ? (
+          <Text style={styles.errorText}>Error al buscar rutas.</Text>
+        ) : (
+          <BusesMatchedList
+            matchedBuses={matchedBuses || []}
             onSelectBus={handleSelectBus}
-        />
+            selectedBusCod={busSelected?.cod}
+          />
+        )}
       </View>
     </View>
   );
@@ -89,7 +120,6 @@ const Maps = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   mapContainer: {
     flex: 1,

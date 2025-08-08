@@ -11,25 +11,23 @@ const convertNodos = (objeto) => {
 };
 
 export const busesSlice = createSlice({
-    name: 'maps',
+    name: 'buses',
     initialState: {
-        value: {
-            busesMatch: [],      // Lista de buses matcheados (con startIndex y endIndex)
-            busesAllMatch: [],   // Todos los buses matcheados, si se necesitan
-            busSelected: null,   // El bus seleccionado para ver en detalle
-            recorrido: {},       // El recorrido completo del bus seleccionado
-            matchedSegment: {    // El segmento del recorrido que coincide con origen/destino
-                startIndex: -1,
-                endIndex: -1,
-            },
-        }
+        busesMatch: [],      // Lista de buses matcheados (con startIndex y endIndex)
+        busesAllMatch: [],   // Todos los buses matcheados, si se necesitan
+        busSelected: null,   // El bus seleccionado para ver en detalle
+        recorrido: {},       // El recorrido completo del bus seleccionado
+        matchedSegment: {    // El segmento del recorrido que coincide con origen/destino
+            startIndex: -1,
+            endIndex: -1,
+        },
     },
     reducers: {
         setBusSelected: (state, action) => {
             // El action.payload ahora es el objeto completo del bus matcheado (incluyendo startIndex/endIndex)
-            state.value.busSelected = action.payload;
-            state.value.matchedSegment.startIndex = action.payload?.startIndex !== undefined ? action.payload.startIndex : -1;
-            state.value.matchedSegment.endIndex = action.payload?.endIndex !== undefined ? action.payload.endIndex : -1;
+            state.busSelected = action.payload;
+            state.matchedSegment.startIndex = action.payload?.startIndex !== undefined ? action.payload.startIndex : -1;
+            state.matchedSegment.endIndex = action.payload?.endIndex !== undefined ? action.payload.endIndex : -1;
         },
         setBusesMatch: (state, action) => {
             // action.payload es un array de objetos { cod, linea, descripcion, startIndex, endIndex }
@@ -48,39 +46,39 @@ export const busesSlice = createSlice({
                     };
                 }).filter(Boolean); // Filtra cualquier `undefined` si no se encontró el bus
 
-                state.value.busesAllMatch = hydratedBuses;
-                state.value.busesMatch = hydratedBuses.slice(0, 7); // Muestra los primeros 7
+                state.busesAllMatch = hydratedBuses;
+                state.busesMatch = hydratedBuses.slice(0, 7); // Muestra los primeros 7
 
                 // Seleccionar el primer bus matcheado por defecto y guardar sus índices de segmento.
                 if (hydratedBuses.length > 0) {
-                    state.value.busSelected = hydratedBuses[0];
-                    state.value.matchedSegment.startIndex = hydratedBuses[0].startIndex;
-                    state.value.matchedSegment.endIndex = hydratedBuses[0].endIndex;
+                    state.busSelected = hydratedBuses[0];
+                    state.matchedSegment.startIndex = hydratedBuses[0].startIndex;
+                    state.matchedSegment.endIndex = hydratedBuses[0].endIndex;
                 } else {
-                    state.value.busSelected = null;
-                    state.value.matchedSegment.startIndex = -1;
-                    state.value.matchedSegment.endIndex = -1;
+                    state.busSelected = null;
+                    state.matchedSegment.startIndex = -1;
+                    state.matchedSegment.endIndex = -1;
                 }
 
             } else {
-                state.value.busesMatch = [];
-                state.value.busesAllMatch = [];
-                state.value.busSelected = null;
-                state.value.recorrido = {};
-                state.value.matchedSegment.startIndex = -1;
-                state.value.matchedSegment.endIndex = -1;
+                state.busesMatch = [];
+                state.busesAllMatch = [];
+                state.busSelected = null;
+                state.recorrido = {};
+                state.matchedSegment.startIndex = -1;
+                state.matchedSegment.endIndex = -1;
             }
         },
         setRecorrido: (state, action) => {
-            state.value.recorrido = convertNodos(action.payload);
+            state.recorrido = convertNodos(action.payload);
         },
         resetMapsState: (state) => { // Un reset más completo para el estado de mapas
-            state.value.busesMatch = [];
-            state.value.busesAllMatch = [];
-            state.value.busSelected = null;
-            state.value.recorrido = {};
-            state.value.matchedSegment.startIndex = -1;
-            state.value.matchedSegment.endIndex = -1;
+            state.busesMatch = [];
+            state.busesAllMatch = [];
+            state.busSelected = null;
+            state.recorrido = {};
+            state.matchedSegment.startIndex = -1;
+            state.matchedSegment.endIndex = -1;
         }
     }
 })

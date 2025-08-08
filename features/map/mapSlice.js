@@ -1,12 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
 import * as Crypto from 'expo-crypto';
 
+const tucumanCenter = {
+    latitude: -26.826016,
+    longitude: -65.214778,
+};
+
 export const mapSlice = createSlice({
     name: 'map',
     initialState: {
-        value: {
-            origin: null,
-            destination: null,
+            origin: {
+            latitude: tucumanCenter.latitude + 0.005,
+            longitude: tucumanCenter.longitude + 0.005,
+        },
+        destination: {
+            latitude: tucumanCenter.latitude - 0.005,
+            longitude: tucumanCenter.longitude - 0.005,
+        },
             location: null,
             center: {
                 latitude: -26.826016,
@@ -15,35 +25,34 @@ export const mapSlice = createSlice({
             sessionKey: Crypto.randomUUID(),
             zoom: 15,
             busesCoords: [],
-        }
     },
     reducers: {
         setOrigin: (state, action) => {
-            state.value.origin = action.payload;
+            state.origin = action.payload;
         },
         setDestination: (state, action) => {
-            state.value.destination = action.payload;
+            state.destination = action.payload;
         },
         setCenter: (state, action) => {
-            state.value.center = action.payload;
+            state.center = action.payload;
         },
         setLocation: (state, action) => {
-            state.value.location = action.payload;
-            if (action.payload && !state.value.origin && !state.value.destination) {
-                state.value.center = action.payload;
+            state.location = action.payload;
+            if (action.payload && !state.origin && !state.destination) {
+                state.center = action.payload;
             }
         },
         setZoom: (state, action) => {
-            state.value.zoom = action.payload;
+            state.zoom = action.payload;
         },
         setBusesCoords: (state, action) => {
-            state.value.busesCoords = action.payload;
+            state.busesCoords = action.payload;
         },
         resetMapState: (state) => {
-            state.value.origin = null;
-            state.value.destination = null;
-            state.value.busesCoords = [];
-            state.value.sessionKey = Crypto.randomUUID();
+            state.origin = null;
+            state.destination = null;
+            state.busesCoords = [];
+            state.sessionKey = Crypto.randomUUID();
         }
     }
 })

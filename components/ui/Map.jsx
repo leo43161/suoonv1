@@ -1,23 +1,23 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polyline, Marker } from 'react-native-maps';
-import {colors} from '../../global/colors';
+import { colors } from '../../global/colors';
 
 /**
- * Componente que renderiza el mapa y los elementos sobre él.
- * Es un componente controlado que recibe toda la data a visualizar vía props.
+ * Componente que renderiza el mapa y sus elementos.
+ * Es un componente 100% controlado que recibe toda la data a visualizar vía props.
+ * Su vista es un reflejo directo del estado de Redux.
  * @param {object} props
- * @param {object} props.initialRegion - La región inicial a mostrar en el mapa.
- * @param {object} props.origin - Coordenadas del marcador de origen.
- * @param {object} props.destination - Coordenadas del marcador de destino.
+ * @param {object} props.region - La región a mostrar en el mapa (controlada).
+ * @param {object | null} props.origin - Coordenadas del marcador de origen.
+ * @param {object | null} props.destination - Coordenadas del marcador de destino.
  * @param {function} props.onOriginDragEnd - Callback al soltar el marcador de origen.
  * @param {function} props.onDestinationDragEnd - Callback al soltar el marcador de destino.
  * @param {array} props.fullRouteCoords - Coordenadas de la ruta completa del colectivo.
  * @param {array} props.matchedSegmentCoords - Coordenadas del tramo que coincide.
- * @returns {React.Component}
  */
 const Map = ({
-  initialRegion,
+  region,
   origin,
   destination,
   onOriginDragEnd,
@@ -25,35 +25,34 @@ const Map = ({
   fullRouteCoords,
   matchedSegmentCoords,
 }) => {
-  console.log('Renderizando el componente Map con MapView...');
-
   return (
     <MapView
       provider={PROVIDER_GOOGLE}
       style={styles.map}
-      initialRegion={initialRegion}
+      // La prop 'region' asegura que el mapa siempre refleje el estado de Redux.
+      region={region}
       showsUserLocation={true}
-      showsMyLocationButton={false} // Usaremos nuestros propios botones
+      showsMyLocationButton={false} // Usaremos nuestros propios controles de UI
     >
-      {/* 1. Renderiza la ruta completa del colectivo (tenue) */}
+      {/* Renderiza la ruta completa del colectivo (si existe) */}
       {fullRouteCoords && fullRouteCoords.length > 0 && (
         <Polyline
           coordinates={fullRouteCoords}
-          strokeColor={colors.secondary || '#888'} // Color secundario o gris
+          strokeColor={colors.secondary || '#888'}
           strokeWidth={4}
         />
       )}
 
-      {/* 2. Renderiza el tramo que coincide (resaltado) */}
+      {/* Renderiza el tramo que coincide (si existe) */}
       {matchedSegmentCoords && matchedSegmentCoords.length > 0 && (
         <Polyline
           coordinates={matchedSegmentCoords}
-          strokeColor={colors.primary} // Color primario, bien visible
-          strokeWidth={7} // Más grueso para destacar
+          strokeColor={colors.primary}
+          strokeWidth={7}
         />
       )}
 
-      {/* 3. Marcador de Origen (arrastrable) */}
+      {/* Marcador de Origen (solo si 'origin' no es null) */}
       {origin && (
         <Marker
           coordinate={origin}
@@ -64,7 +63,7 @@ const Map = ({
         />
       )}
 
-      {/* 4. Marcador de Destino (arrastrable) */}
+      {/* Marcador de Destino (solo si 'destination' no es null) */}
       {destination && (
         <Marker
           coordinate={destination}
@@ -80,7 +79,7 @@ const Map = ({
 
 const styles = StyleSheet.create({
   map: {
-    ...StyleSheet.absoluteFillObject, // Hace que el mapa ocupe todo el contenedor
+    ...StyleSheet.absoluteFillObject,
   },
 });
 

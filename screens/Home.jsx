@@ -1,5 +1,4 @@
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
-import React from 'react';
 import { colors } from '../global/colors';
 import Card from '../components/common/Card';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -38,7 +37,7 @@ const Home = () => {
             </Card>
 
             {/* Título "Encuentra" con card outline */}
-            <View style={styles.findSection}>
+            <TouchableOpacity onPress={onSearchPress} style={styles.findSection}>
                 <Text style={styles.sectionTitle}>Encuentra</Text>
                 <Card additionalStyle={styles.findCard}>
                     <Image
@@ -52,7 +51,7 @@ const Home = () => {
                         </Text>
                     </View>
                 </Card>
-            </View>
+            </TouchableOpacity>
 
             {/* Título "Colectivos populares" y lista de cards */}
             <View style={styles.popularBusesSection}>
