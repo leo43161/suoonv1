@@ -9,7 +9,7 @@ import BusMatch from './BusMatch';
  * @param {function} props.onSelectBus - Función para manejar la selección de un bus.
  * @returns {React.Component}
  */
-const BusesMatchedList = ({ matchedBuses, onSelectBus }) => {
+const BusesMatchedList = ({ matchedBuses, onSelectBus, selectedBusCod  }) => {
   if (!matchedBuses || matchedBuses.length === 0) {
     return (
       <View style={styles.container}>
@@ -23,7 +23,7 @@ const BusesMatchedList = ({ matchedBuses, onSelectBus }) => {
       <FlatList
         data={matchedBuses}
         renderItem={({ item }) => (
-          <BusMatch bus={item} onPress={() => onSelectBus(item)} />
+          <BusMatch bus={item} onPress={() => onSelectBus(item)} isSelected={item.cod === selectedBusCod} />
         )}
         keyExtractor={(item) => item.cod.toString()}
         horizontal

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -11,6 +11,7 @@ import { setBusSelected } from '../../features/buses/busesSlice';
 
 const Maps = () => {
   const dispatch = useDispatch();
+  const mapRef = useRef(null);
   const {
     origin,
     destination,
@@ -18,7 +19,7 @@ const Maps = () => {
     zoom,
     busesCoords
   } = useSelector((state) => state.mapReducer);
-  
+
   const { busSelected } = useSelector((state) => state.busesReducer);
 
   const [matchedSegmentCoords, setMatchedSegmentCoords] = useState([]);
@@ -31,6 +32,22 @@ const Maps = () => {
     { origin, destination },
     { skip: !origin || !destination } // No ejecuta la consulta si falta origen o destino
   );
+
+  // --- EFECTO PARA AJUSTAR EL MAPA AL TRAMO ---
+  useEffect(() => {
+    // Si tenemos un segmento para mostrar y la ref del mapa está lista...
+    if (matchedSegmentCoords.length > 0 && mapRef.current) {
+      mapRef.current.fitToCoordinates(matchedSegmentCoords, {
+        edgePadding: {
+          top: 50,
+          right: 50,
+          bottom: 150, // Más padding abajo para no ser tapado por la lista de buses
+          left: 50,
+        },
+        animated: true,
+      });
+    }
+  }, [matchedSegmentCoords]);
 
   // --- EFECTO PARA SELECCIONAR EL PRIMER BUS POR DEFECTO ---
   useEffect(() => {
@@ -62,7 +79,7 @@ const Maps = () => {
   // --- MANEJADORES DE EVENTOS ---
   const handleOriginDragEnd = (coords) => {
     dispatch(setOrigin(coords));
-    dispatch(setBusSelected(null)); 
+    dispatch(setBusSelected(null));
   };
 
   const handleDestinationDragEnd = (coords) => {
@@ -90,6 +107,7 @@ const Maps = () => {
     <View style={styles.container}>
       <View style={styles.mapContainer}>
         <Map
+          ref={mapRef}
           region={region}
           origin={origin}
           destination={destination}
