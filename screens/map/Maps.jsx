@@ -9,9 +9,13 @@ import Map from '../../components/ui/Map';
 import BusesMatchedList from '../../components/ui/BusesMatchedList';
 import { setBusSelected } from '../../features/buses/busesSlice';
 
+import SearchBottomSheet from '../../components/search/SearchBottomSheet';
+
+
 const Maps = () => {
   const dispatch = useDispatch();
   const mapRef = useRef(null);
+  const bottomSheetRef = useRef(null);
   const {
     origin,
     destination,
@@ -103,6 +107,18 @@ const Maps = () => {
     longitudeDelta: 0.0421 / (2 ** (zoom - 12)),
   };
 
+  useEffect(() => {
+    // Verificamos si el parámetro 'openSheetOnLoad' fue enviado y es true
+    if (route.params?.openSheetOnLoad) {
+      // Si es así, usamos la ref para llamar al método 'expand' del BottomSheet
+      bottomSheetRef.current?.expand();
+    }
+  }, [route.params?.openSheetOnLoad]); // El efecto depende de este parámetro
+
+  const handleOpenSearch = () => {
+    bottomSheetRef.current?.expand();
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.mapContainer}>
@@ -131,6 +147,7 @@ const Maps = () => {
           />
         )}
       </View>
+      <SearchBottomSheet ref={bottomSheetRef} />
     </View>
   );
 };

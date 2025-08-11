@@ -11,6 +11,7 @@ import busesData from '../../data/Buses.json';
  * @returns {number} - Distancia en kilómetros.
  */
 const getDistanceInKm = (p1, p2) => {
+    if (!p1 || !p2) return Infinity;
     const R = 6371; // Radio de la Tierra en km
     const dLat = (p2.latitude - p1.latitude) * (Math.PI / 180);
     const dLon = (p2.longitude - p1.longitude) * (Math.PI / 180);
@@ -45,7 +46,7 @@ export const busesApi = createApi({
                     const paradasDestinoCercanas = [];
 
                     // 2. Encontrar todos los nodos cercanos al origen y al destino
-                    bus.nodos.forEach((nodo, index) => {
+                    bus.nodos.reverse().forEach((nodo, index) => {
                         const punto = { latitude: nodo[0], longitude: nodo[1] };
                         if (getDistanceInKm(origin, punto) <= radio) {
                             paradasOrigenCercanas.push({ index, punto });
@@ -60,7 +61,9 @@ export const busesApi = createApi({
                         let mejorTramo = {
                             startIndex: -1,
                             endIndex: -1,
-                            distanciaMinima: 10000000000,
+                            distanciaMinima: Infinity,
+                            startPoint: null,
+                            endPoint: null,
                         };
 
                         // 4. Encontrar el tramo más corto entre las paradas cercanas
@@ -74,6 +77,8 @@ export const busesApi = createApi({
                                             startIndex: paradaOrigen.index,
                                             endIndex: paradaDestino.index,
                                             distanciaMinima: distanciaTramo,
+                                            startPoint: paradaOrigen.punto,
+                                            endPoint: paradaDestino.punto,
                                         };
                                     }
                                 }
@@ -82,19 +87,24 @@ export const busesApi = createApi({
 
                         // 5. Si se encontró un tramo válido, añadir el colectivo a la lista de matches
                         if (mejorTramo.startIndex !== -1) {
-                            matchedBuses.push({
-                                cod: bus.cod,
-                                linea: bus.linea,
-                                descripcion: bus.descripcion,
-                                ramal: bus.ramal,
-                                nodos: bus.nodos.map(n => ({ latitude: n[0], longitude: n[1] })),
-                                startIndex: mejorTramo.startIndex,
-                                endIndex: mejorTramo.endIndex,
-                            });
+                            // --- ¡EL NUEVO CONTROL DE REALIDAD! ---
+                            const distAlDestinoDesdeInicioTramo = getDistanceInKm(mejorTramo.startPoint, destination);
+                            const distAlDestinoDesdeFinTramo = getDistanceInKm(mejorTramo.endPoint, destination);
+                            if (distAlDestinoDesdeFinTramo < distAlDestinoDesdeInicioTramo) {
+                                matchedBuses.push({
+                                    cod: bus.cod,
+                                    linea: bus.linea,
+                                    descripcion: bus.descripcion,
+                                    ramal: bus.ramal,
+                                    nodos: bus.nodos.map(n => ({ latitude: n[0], longitude: n[1] })),
+                                    startIndex: mejorTramo.startIndex,
+                                    endIndex: mejorTramo.endIndex,
+                                });
+                            }
                         }
                     }
                 }
-                
+
                 // 6. Devolver los colectivos encontrados. RTK Query lo cacheará.
                 return { data: matchedBuses };
             }

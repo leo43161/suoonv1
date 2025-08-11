@@ -35,7 +35,7 @@ const Map = forwardRef(({ region, origin, ...props }, ref) => {
           title="Origen"
           draggable
           onDragEnd={(e) => props.onOriginDragEnd(e.nativeEvent.coordinate)}
-          pinColor={colors.primary}
+          pinColor={"#FF0000"}
         />
       )}
       {props.destination && (
@@ -44,7 +44,7 @@ const Map = forwardRef(({ region, origin, ...props }, ref) => {
           title="Destino"
           draggable
           onDragEnd={(e) => props.onDestinationDragEnd(e.nativeEvent.coordinate)}
-          pinColor={colors.dark}
+          pinColor={"#00FF00"}
         />
       )}
     </MapView>
