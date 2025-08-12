@@ -42,6 +42,14 @@ export const mapSlice = createSlice({
                 state.center = action.payload;
             }
         },
+        swapOriginDestination: (state) => {
+            // Solo intercambiamos si ambos existen para evitar errores
+            if (state.origin && state.destination) {
+                const tempOrigin = state.origin;
+                state.origin = state.destination;
+                state.destination = tempOrigin;
+            }
+        },
         setZoom: (state, action) => {
             state.zoom = action.payload;
         },
@@ -57,5 +65,5 @@ export const mapSlice = createSlice({
     }
 })
 
-export const { setOrigin, setDestination, setLocation, setZoom, setCenter, setBusesCoords, resetMapState } = mapSlice.actions;
+export const { setOrigin, setDestination, setLocation, setZoom, setCenter, setBusesCoords, resetMapState, swapOriginDestination } = mapSlice.actions;
 export default mapSlice.reducer;

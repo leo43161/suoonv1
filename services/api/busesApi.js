@@ -109,7 +109,37 @@ export const busesApi = createApi({
                 return { data: matchedBuses };
             }
         }),
+        reverseGeocode: builder.mutation({
+            queryFn: async ({ latitude, longitude }) => {
+                const apiToken = process.env.EXPO_PUBLIC_MAPBOX_API_TOKEN;
+                if (!apiToken) {
+                    console.error('Mapbox API token no está configurado.');
+                    return { error: 'Mapbox API token not configured' };
+                }
+                
+                // Construimos la URL para la API de Geocodificación de Mapbox
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?language=es&access_token=${apiToken}`;
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Error en la respuesta de la API de Mapbox');
+                    
+                    const data = await response.json();
+
+                    if (data.features && data.features.length > 0) {
+                        // La dirección más relevante suele ser el primer resultado
+                        const address = data.features[0].place_name;
+                        return { data: { address } }; // RTK Query espera un objeto { data: ... }
+                    } else {
+                        return { data: { address: 'Dirección no encontrada' } };
+                    }
+                } catch (error) {
+                    console.error('Error al realizar la geocodificación inversa:', error);
+                    return { error: error.message };
+                }
+            }
+        }),
     }),
 });
 
-export const { useGetRecorridoByCoordsQuery } = busesApi;
+export const { useGetRecorridoByCoordsQuery, useReverseGeocodeMutation } = busesApi;
