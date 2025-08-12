@@ -1,19 +1,22 @@
 import React, { forwardRef, useMemo } from 'react';
-import { View, Text, StyleSheet, TextInput } from 'react-native';
-import BottomSheet from '@gorhom/bottom-sheet';
-
-const SearchBottomSheet = forwardRef((props, ref) => {
+import { Text, StyleSheet, TextInput, View } from 'react-native';
+// Importamos BottomSheetView además de BottomSheet
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+const SearchBottomSheet = forwardRef(({ index, onChange }, ref) => {
     const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
 
     return (
         <BottomSheet
             ref={ref}
-            index={-1} // Comienza cerrado
+            index={index}
             snapPoints={snapPoints}
             enablePanDownToClose={true}
+            onChange={onChange}
         >
-            <View style={styles.contentContainer}>
+            {/* Cambiamos View por BottomSheetView */}
+            <BottomSheetView style={styles.contentContainer}>
                 <Text style={styles.title}>Planifica tu viaje</Text>
+                {/* ... inputs ... */}
                 <View style={styles.inputContainer}>
                     <Text>Origen</Text>
                     <TextInput style={styles.input} placeholder="Ubicación actual" />
@@ -22,7 +25,7 @@ const SearchBottomSheet = forwardRef((props, ref) => {
                     <Text>Destino</Text>
                     <TextInput style={styles.input} placeholder="Escribe una dirección" />
                 </View>
-            </View>
+            </BottomSheetView>
         </BottomSheet>
     );
 });
