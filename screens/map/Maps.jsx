@@ -18,7 +18,6 @@ import RouteSearchTrigger from '../../components/search/RouteSearchTrigger';
 
 
 const Maps = ({ route }) => {
-  console.log('Parámetros de ruta recibidos en Maps.jsx:', route.params);
   const dispatch = useDispatch();
   const mapRef = useRef(null);
   const bottomSheetRef = useRef(null);
@@ -145,12 +144,12 @@ const Maps = ({ route }) => {
 
   const handleOpenOriginSearch = () => {
     setActiveInput('origin'); // Marcamos que el input de origen es el activo
-    setSheetIndex(0); // Abrimos el BottomSheet
+    setSheetIndex(2); // Abrimos el BottomSheet
   };
 
   const handleOpenDestinationSearch = () => {
     setActiveInput('destination'); // Marcamos que el input de destino es el activo
-    setSheetIndex(0);
+    setSheetIndex(2);
   };
 
   const handleSheetChanges = (index) => {

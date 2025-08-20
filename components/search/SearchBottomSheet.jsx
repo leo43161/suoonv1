@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 // Añadimos la prop 'activeInput'
 const SearchBottomSheet = forwardRef(({ index, onChange, originAddress, handleSwap, activeInput }, ref) => {
-    const snapPoints = useMemo(() => ['90%'], []);
+    const snapPoints = useMemo(() => ['60%','90%'], []);
     
     // Refs para los inputs
     const originInputRef = useRef(null);
@@ -40,11 +40,11 @@ const SearchBottomSheet = forwardRef(({ index, onChange, originAddress, handleSw
                     <View style={styles.inputsColumn}>
                         <View style={styles.inputContainer}>
                             <Text>Origen</Text>
-                            <TextInput ref={originInputRef} style={styles.input} value={originAddress} />
+                            <TextInput placeholderTextColor={'#ccc'} ref={originInputRef} style={styles.input} value={originAddress} />
                         </View>
                         <View style={styles.inputContainer}>
                             <Text>Destino</Text>
-                            <TextInput ref={destinationInputRef} style={styles.input} placeholder="Escribe una dirección" />
+                            <TextInput placeholderTextColor={'#ccc'} ref={destinationInputRef} style={styles.input} placeholder="Escribe una dirección" />
                         </View>
                     </View>
                     <TouchableOpacity style={styles.swapButton} onPress={handleSwap}>
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         paddingVertical: 8,
         fontSize: 16,
+        color: '#000',
     },
     swapButton: {
         padding: 10,
