@@ -1,10 +1,30 @@
-import React, { forwardRef, useMemo } from 'react';
-// Asegúrate de importar TouchableOpacity
+import React, { forwardRef, useMemo, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
-const SearchBottomSheet = forwardRef(({ index, onChange, originAddress, onSwapPress  }, ref) => {
-    const snapPoints = useMemo(() => ['45%', '50%', '90%'], []);
+
+// Añadimos la prop 'activeInput'
+const SearchBottomSheet = forwardRef(({ index, onChange, originAddress, handleSwap, activeInput }, ref) => {
+    const snapPoints = useMemo(() => ['90%'], []);
+    
+    // Refs para los inputs
+    const originInputRef = useRef(null);
+    const destinationInputRef = useRef(null);
+
+    // Efecto para enfocar el input correcto cuando se abre el panel
+    useEffect(() => {
+        // Si el panel está abierto (index >= 0)
+        if (index >= 0) {
+            // Damos un pequeño delay para asegurar que el input sea visible antes de enfocarlo
+            setTimeout(() => {
+                if (activeInput === 'origin') {
+                    originInputRef.current?.focus();
+                } else if (activeInput === 'destination') {
+                    destinationInputRef.current?.focus();
+                }
+            }, 100);
+        }
+    }, [index, activeInput]); // Se ejecuta cuando el panel se abre/cierra o el input activo cambia
 
     return (
         <BottomSheet
@@ -15,26 +35,22 @@ const SearchBottomSheet = forwardRef(({ index, onChange, originAddress, onSwapPr
             onChange={onChange}
         >
             <BottomSheetView style={styles.contentContainer}>
-                <Text style={styles.title}>Planifica tu viaje</Text>
-
+                {/* ... (título y contenedor de búsqueda) */}
                 <View style={styles.searchContainer}>
                     <View style={styles.inputsColumn}>
                         <View style={styles.inputContainer}>
                             <Text>Origen</Text>
-                            <TextInput style={styles.input} value={originAddress} />
+                            <TextInput ref={originInputRef} style={styles.input} value={originAddress} />
                         </View>
                         <View style={styles.inputContainer}>
                             <Text>Destino</Text>
-                            <TextInput style={styles.input} placeholder="Escribe una dirección" />
+                            <TextInput ref={destinationInputRef} style={styles.input} placeholder="Escribe una dirección" />
                         </View>
                     </View>
-
-                    {/* --- NUEVO BOTÓN DE INTERCAMBIO --- */}
-                    <TouchableOpacity style={styles.swapButton} onPress={onSwapPress}>
+                    <TouchableOpacity style={styles.swapButton} onPress={handleSwap}>
                         <Ionicons name="swap-vertical" size={24} color="#555" />
                     </TouchableOpacity>
                 </View>
-
             </BottomSheetView>
         </BottomSheet>
     );

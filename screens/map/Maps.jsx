@@ -14,6 +14,7 @@ import { useGetRecorridoByCoordsQuery, useReverseGeocodeMutation } from '../../s
 import Map from '../../components/ui/Map';
 import BusesMatchedList from '../../components/ui/BusesMatchedList';
 import SearchBottomSheet from '../../components/search/SearchBottomSheet';
+import RouteSearchTrigger from '../../components/search/RouteSearchTrigger';
 
 
 const Maps = ({ route }) => {
@@ -22,14 +23,15 @@ const Maps = ({ route }) => {
   const mapRef = useRef(null);
   const bottomSheetRef = useRef(null);
 
-  
+
   const [triggerReverseGeocode] = useReverseGeocodeMutation();
-  // --- NUEVO ESTADO PARA CONTROLAR EL BOTTOMSHEET ---
   // -1 = cerrado, 0 = primer snapPoint, 1 = segundo snapPoint, etc.
   const [sheetIndex, setSheetIndex] = useState(0);
   const [originAddress, setOriginAddress] = useState('Buscando tu ubicación...');
   const [destinationAddress, setDestinationAddress] = useState('');
   const [matchedSegmentCoords, setMatchedSegmentCoords] = useState([]);
+
+  const [activeInput, setActiveInput] = useState(null);
 
   // --- LECTURA DEL ESTADO DE REDUX ---
   const { origin, destination, center, zoom, busesCoords } = useSelector((state) => state.mapReducer);
@@ -116,10 +118,6 @@ const Maps = ({ route }) => {
     setSheetIndex(0); // Abre el BottomSheet
   };
 
-  const handleSheetChanges = (index) => {
-    setSheetIndex(index); // Sincroniza el estado si el usuario cierra el panel
-  };
-
   const handleSwap = () => {
     // 1. Despacha la acción para intercambiar las coordenadas en Redux
     dispatch(swapOriginDestination());
@@ -145,6 +143,24 @@ const Maps = ({ route }) => {
     dispatch(setBusesCoords(bus.nodos));
   };
 
+  const handleOpenOriginSearch = () => {
+    setActiveInput('origin'); // Marcamos que el input de origen es el activo
+    setSheetIndex(0); // Abrimos el BottomSheet
+  };
+
+  const handleOpenDestinationSearch = () => {
+    setActiveInput('destination'); // Marcamos que el input de destino es el activo
+    setSheetIndex(0);
+  };
+
+  const handleSheetChanges = (index) => {
+    setSheetIndex(index);
+    // Si el usuario cierra el panel, reseteamos el input activo
+    if (index === -1) {
+      setActiveInput(null);
+    }
+  };
+
   const region = {
     latitude: center.latitude,
     longitude: center.longitude,
@@ -166,9 +182,12 @@ const Maps = ({ route }) => {
       />
 
       {/* Disparador de Búsqueda en la parte superior */}
-      <TouchableOpacity style={styles.searchTrigger} onPress={handleOpenSearch}>
-        <Text style={styles.searchTriggerText}>¿Hacia donde vas?</Text>
-      </TouchableOpacity>
+      <RouteSearchTrigger
+        originAddress={originAddress}
+        destinationAddress={destinationAddress}
+        onOriginPress={handleOpenOriginSearch}
+        onDestinationPress={handleOpenDestinationSearch}
+      />
 
       {/* La lista de resultados sigue en su lugar */}
       <View style={styles.busesListContainer}>
@@ -191,6 +210,8 @@ const Maps = ({ route }) => {
         index={sheetIndex}
         onChange={handleSheetChanges}
         originAddress={originAddress}
+        handleSwap={handleSwap}
+        activeInput={activeInput}
       />
     </View>
   );
