@@ -1,12 +1,14 @@
-import React, { forwardRef, useMemo, useRef, useEffect } from 'react';
+import React, { forwardRef, useMemo, useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Ionicons } from '@expo/vector-icons';
+import SearchResult from './SearchResult';
 
 // Añadimos la prop 'activeInput'
 const SearchBottomSheet = forwardRef(({ index, onChange, originAddress, handleSwap, activeInput }, ref) => {
-    const snapPoints = useMemo(() => ['60%','90%'], []);
-    
+    const snapPoints = useMemo(() => ['60%', '90%'], []);
+    const [searchResults, setSearchResults] = useState("");
+
     // Refs para los inputs
     const originInputRef = useRef(null);
     const destinationInputRef = useRef(null);
@@ -36,20 +38,25 @@ const SearchBottomSheet = forwardRef(({ index, onChange, originAddress, handleSw
         >
             <BottomSheetView style={styles.contentContainer}>
                 {/* ... (título y contenedor de búsqueda) */}
-                <View style={styles.searchContainer}>
-                    <View style={styles.inputsColumn}>
-                        <View style={styles.inputContainer}>
-                            <Text>Origen</Text>
-                            <TextInput placeholderTextColor={'#ccc'} ref={originInputRef} style={styles.input} value={originAddress} />
+                <View>
+                    <View style={styles.searchContainer}>
+                        <View style={styles.inputsColumn}>
+                            <View style={styles.inputContainer}>
+                                <Text>Origen</Text>
+                                <TextInput placeholderTextColor={'#ccc'} ref={originInputRef} style={styles.input} value={originAddress} />
+                            </View>
+                            <View style={styles.inputContainer}>
+                                <Text>Destino</Text>
+                                <TextInput placeholderTextColor={'#ccc'} ref={destinationInputRef} style={styles.input} placeholder="Escribe una dirección" onChange={(e) => setSearchResults(e.nativeEvent.text)} />
+                            </View>
                         </View>
-                        <View style={styles.inputContainer}>
-                            <Text>Destino</Text>
-                            <TextInput placeholderTextColor={'#ccc'} ref={destinationInputRef} style={styles.input} placeholder="Escribe una dirección" />
-                        </View>
+                        <TouchableOpacity style={styles.swapButton} onPress={handleSwap}>
+                            <Ionicons name="swap-vertical" size={24} color="#555" />
+                        </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={styles.swapButton} onPress={handleSwap}>
-                        <Ionicons name="swap-vertical" size={24} color="#555" />
-                    </TouchableOpacity>
+                    <View>
+                        <SearchResult keyword={searchResults} />
+                    </View>
                 </View>
             </BottomSheetView>
         </BottomSheet>

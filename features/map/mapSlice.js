@@ -9,7 +9,7 @@ const tucumanCenter = {
 export const mapSlice = createSlice({
     name: 'map',
     initialState: {
-            origin: {
+        origin: {
             latitude: tucumanCenter.latitude + 0.005,
             longitude: tucumanCenter.longitude + 0.005,
         },
@@ -17,14 +17,14 @@ export const mapSlice = createSlice({
             latitude: tucumanCenter.latitude - 0.005,
             longitude: tucumanCenter.longitude - 0.005,
         },
-            location: null,
-            center: {
-                latitude: -26.826016,
-                longitude: -65.214778,
-            },
-            sessionKey: Crypto.randomUUID(),
-            zoom: 15,
-            busesCoords: [],
+        location: null,
+        center: {
+            latitude: -26.826016,
+            longitude: -65.214778,
+        },
+        sessionKey: Crypto.randomUUID(),
+        zoom: 15,
+        busesCoords: [],
     },
     reducers: {
         setOrigin: (state, action) => {

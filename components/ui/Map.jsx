@@ -11,8 +11,9 @@ const Map = forwardRef(({ region, origin, ...props }, ref) => {
       provider={PROVIDER_GOOGLE}
       style={styles.map}
       region={region}
-      showsUserLocation={true}
+      showsUserLocation={false}
       showsMyLocationButton={false}
+      rotateEnabled={false}
     >
       {/* ...el resto del JSX de los polylines y markers se mantiene igual... */}
       {props.fullRouteCoords && props.fullRouteCoords.length > 0 && (

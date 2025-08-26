@@ -25,7 +25,7 @@ const Maps = ({ route }) => {
 
   const [triggerReverseGeocode] = useReverseGeocodeMutation();
   // -1 = cerrado, 0 = primer snapPoint, 1 = segundo snapPoint, etc.
-  const [sheetIndex, setSheetIndex] = useState(0);
+  const [sheetIndex, setSheetIndex] = useState(1);
   const [originAddress, setOriginAddress] = useState('Buscando tu ubicación...');
   const [destinationAddress, setDestinationAddress] = useState('');
   const [matchedSegmentCoords, setMatchedSegmentCoords] = useState([]);
@@ -107,15 +107,10 @@ const Maps = ({ route }) => {
   // --- NUEVO EFECTO PARA ABRIR EL BOTTOMSHEET AL NAVEGAR ---
   useEffect(() => {
     if (route.params?.openSheetOnLoad) {
-      setSheetIndex(0); // Cambia el estado para abrir el BottomSheet
+      setSheetIndex(2); // Cambia el estado para abrir el BottomSheet
     }
   }, [route.params?.openSheetOnLoad]);
 
-
-  // --- MANEJADORES DE EVENTOS ---
-  const handleOpenSearch = () => {
-    setSheetIndex(0); // Abre el BottomSheet
-  };
 
   const handleSwap = () => {
     // 1. Despacha la acción para intercambiar las coordenadas en Redux

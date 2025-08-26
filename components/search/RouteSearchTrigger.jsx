@@ -37,7 +37,7 @@ const RouteSearchTrigger = ({ originAddress, destinationAddress, onOriginPress, 
 const styles = StyleSheet.create({
     container: {
         position: 'absolute',
-        top: 60,
+        top: 30,
         left: 20,
         right: 20,
         backgroundColor: 'white',

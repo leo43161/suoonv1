@@ -1,4 +1,4 @@
-package com.leo43.bustuc
+package com.suoon.app
 
 import android.app.Application
 import android.content.res.Configuration
