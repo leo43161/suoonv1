@@ -2,8 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../global/colors'; // Asumiendo que tienes un archivo de colores globales
+import { useSelector } from 'react-redux';
 
-const RouteSearchTrigger = ({ originAddress, destinationAddress, onOriginPress, onDestinationPress }) => {
+const RouteSearchTrigger = ({ onOriginPress, onDestinationPress }) => {
+    const { originAddress, destinationAddress } = useSelector((state) => state.searchReducer);
     return (
         <View style={styles.container}>
             {/* La línea punteada y los círculos para el detalle visual */}

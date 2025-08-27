@@ -4,7 +4,7 @@ import { ActivityIndicator, StyleSheet, View, Text, TouchableOpacity } from 'rea
 import { useSelector, useDispatch } from 'react-redux';
 
 // Acciones de Redux
-import { setOrigin, setDestination, setBusesCoords, swapOriginDestination } from '../../features/map/mapSlice';
+import { setOrigin, setDestination, setBusesCoords } from '../../features/map/mapSlice';
 import { setBusSelected } from '../../features/buses/busesSlice';
 
 // RTK Query Hook
@@ -15,6 +15,7 @@ import Map from '../../components/ui/Map';
 import BusesMatchedList from '../../components/ui/BusesMatchedList';
 import SearchBottomSheet from '../../components/search/SearchBottomSheet';
 import RouteSearchTrigger from '../../components/search/RouteSearchTrigger';
+import { setOriginAddress, setOriginSearchAddress } from '../../features/map/searchSlice';
 
 
 const Maps = ({ route }) => {
@@ -22,14 +23,12 @@ const Maps = ({ route }) => {
   const mapRef = useRef(null);
   const bottomSheetRef = useRef(null);
 
-
   const [triggerReverseGeocode] = useReverseGeocodeMutation();
+
   // -1 = cerrado, 0 = primer snapPoint, 1 = segundo snapPoint, etc.
   const [sheetIndex, setSheetIndex] = useState(1);
-  const [originAddress, setOriginAddress] = useState('Buscando tu ubicación...');
-  const [destinationAddress, setDestinationAddress] = useState('');
-  const [matchedSegmentCoords, setMatchedSegmentCoords] = useState([]);
 
+  const [matchedSegmentCoords, setMatchedSegmentCoords] = useState([]);
   const [activeInput, setActiveInput] = useState(null);
 
   // --- LECTURA DEL ESTADO DE REDUX ---
@@ -43,15 +42,18 @@ const Maps = ({ route }) => {
     isLoading
   } = useGetRecorridoByCoordsQuery(
     { origin, destination },
-    { skip: !origin || !destination }
+    { skip: !origin || !destination, refetchOnMountOrArgChange: true }
   );
 
   // --- NUEVO EFECTO PARA OBTENER LA UBICACIÓN INICIAL ---
   useEffect(() => {
+    dispatch(setOriginAddress('Buscando tu ubicación...'));
+    dispatch(setOriginSearchAddress('Buscando tu ubicación...'));
     const getLocation = async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        setOriginAddress('Permiso de ubicación denegado');
+        dispatch(setOriginAddress('Permiso de ubicación denegado'));
+        dispatch(setOriginSearchAddress('Permiso de ubicación denegado'));
         return;
       }
 
@@ -65,11 +67,14 @@ const Maps = ({ route }) => {
       try {
         // .unwrap() permite usar try/catch para manejar el éxito y el error
         const result = await triggerReverseGeocode({ latitude, longitude }).unwrap();
+        console.log(result);
         // 3. Si tiene éxito, actualizamos el estado con la dirección
-        setOriginAddress(result.address);
+        dispatch(setOriginAddress(result.address));
+        dispatch(setOriginSearchAddress(result.address));
       } catch (error) {
         console.error('Falló la geocodificación inversa:', error);
-        setOriginAddress('No se pudo obtener la dirección');
+        dispatch(setOriginAddress('No se pudo obtener la dirección'));
+        dispatch(setOriginSearchAddress('No se pudo obtener la dirección'));
       }
     };
     getLocation();
@@ -92,7 +97,7 @@ const Maps = ({ route }) => {
       dispatch(setBusesCoords([]));
       dispatch(setBusSelected(null));
     }
-  }, [matchedBuses, busSelected, dispatch]);
+  }, [matchedBuses, busSelected, dispatch, origin, destination]);
 
   useEffect(() => {
     if (busSelected && busSelected.nodos && busSelected.startIndex !== -1) {
@@ -101,7 +106,7 @@ const Maps = ({ route }) => {
     } else {
       setMatchedSegmentCoords([]);
     }
-  }, [busSelected]);
+  }, [busSelected, origin, destination]);
 
 
   // --- NUEVO EFECTO PARA ABRIR EL BOTTOMSHEET AL NAVEGAR ---
@@ -110,17 +115,6 @@ const Maps = ({ route }) => {
       setSheetIndex(2); // Cambia el estado para abrir el BottomSheet
     }
   }, [route.params?.openSheetOnLoad]);
-
-
-  const handleSwap = () => {
-    // 1. Despacha la acción para intercambiar las coordenadas en Redux
-    dispatch(swapOriginDestination());
-
-    // 2. Intercambia las direcciones en el estado local del componente
-    const tempAddress = originAddress;
-    setOriginAddress(destinationAddress);
-    setDestinationAddress(tempAddress);
-  };
 
   const handleOriginDragEnd = (coords) => {
     dispatch(setOrigin(coords));
@@ -177,8 +171,6 @@ const Maps = ({ route }) => {
 
       {/* Disparador de Búsqueda en la parte superior */}
       <RouteSearchTrigger
-        originAddress={originAddress}
-        destinationAddress={destinationAddress}
         onOriginPress={handleOpenOriginSearch}
         onDestinationPress={handleOpenDestinationSearch}
       />
@@ -203,8 +195,6 @@ const Maps = ({ route }) => {
         ref={bottomSheetRef}
         index={sheetIndex}
         onChange={handleSheetChanges}
-        originAddress={originAddress}
-        handleSwap={handleSwap}
         activeInput={activeInput}
       />
     </View>

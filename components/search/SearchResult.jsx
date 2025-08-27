@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TouchableHighlight, View, ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { formatAddress } from '../../utilities/search';
 import { MAPBOX_API_TOKEN } from '../../constants/config';
+import { setDestinationAddress, setOriginAddress, setDestinationSearchAddress, setOriginSearchAddress } from '../../features/map/searchSlice';
 import Card from '../common/Card'
 import { colors } from '../../global/colors';
+import { setDestination, setOrigin } from '../../features/map/mapSlice';
 
 
-const SearchResult = ({ keyword = "", handleInput, onModalOpen }) => {
+const SearchResult = ({ inputFocus, handleInput, onModalOpen }) => {
+    const dispatch = useDispatch();
     const [searchResults, setSearchResults] = useState([]);
     const [isLoadingData, setIsLoadingData] = useState(false);
     const { sessionKey } = useSelector(state => state.mapReducer);
+    const { originSearchAddress, destinationSearchAddress } = useSelector((state) => state.searchReducer);
     const apiToken = MAPBOX_API_TOKEN;
     const iconsResults = {
         address: 'map-marker-alt',
@@ -20,7 +24,11 @@ const SearchResult = ({ keyword = "", handleInput, onModalOpen }) => {
 
     useEffect(() => {
         let timer;
+        const keyword = inputFocus === 'origen' ? originSearchAddress : destinationSearchAddress;
+        console.log(keyword)
         const searchWithDelay = async () => {
+            console.log("Explorando error Trim 1");
+            console.log(keyword);
             // Si la palabra clave no está vacía
             if (keyword.trim() !== '') {
                 setIsLoadingData(true);
@@ -47,6 +55,8 @@ const SearchResult = ({ keyword = "", handleInput, onModalOpen }) => {
             clearTimeout(timer);
             timer = setTimeout(searchWithDelay, 3000); // 3 segundos de retraso
         };
+        console.log("Explorando error Trim 2");
+        console.log(keyword);
 
         if (keyword.trim() !== '') {
             delayedSearch();
@@ -57,11 +67,13 @@ const SearchResult = ({ keyword = "", handleInput, onModalOpen }) => {
 
         // Limpiar el temporizador en la limpieza del efecto
         return () => clearTimeout(timer);
-    }, [keyword, sessionKey, apiToken]);
+    }, [inputFocus, sessionKey, apiToken, originSearchAddress, destinationSearchAddress]);
 
     const handleResults = async (result, filter = false) => {
         if (result.feature_type === 'street' && filter) {
             const place = result.context.place.name;
+            console.log("Explorando error Trim 3");
+            console.log(place);
             const street = result.context.street.name.replace(place, '').trim();
             handleInput(`${street}, `, street.length + 2);
             return;
@@ -70,9 +82,20 @@ const SearchResult = ({ keyword = "", handleInput, onModalOpen }) => {
             const apiUrl = `https://api.mapbox.com/search/searchbox/v1/retrieve/${result.mapbox_id}?session_token=${sessionKey}&access_token=${apiToken}`;
             const response = await fetch(apiUrl);
             const data = await response.json();
-            console.log(data.features);
-            /* setSearchResults(data.features);
-            setIsLoadingData(false); */
+            const address = result.feature_type === 'street' ?
+                `${data.features[0].properties.context.street.name}, ${data.features[0].properties.context.place.name}`
+                :
+                data.features[0].properties.address;
+            const [longitude, latitude] = data.features[0].geometry.coordinates;
+            if (inputFocus === 'origen') {
+                dispatch(setOriginAddress(address));
+                dispatch(setOriginSearchAddress(address));
+                dispatch(setOrigin({ latitude, longitude }));
+            } else {
+                dispatch(setDestinationAddress(address));
+                dispatch(setDestinationSearchAddress(address));
+                dispatch(setDestination({ latitude, longitude }));
+            }
         } catch (error) {
             console.error('Error al buscar la ubicación:', error);
             setIsLoadingData(false);

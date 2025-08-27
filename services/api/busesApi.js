@@ -128,7 +128,10 @@ export const busesApi = createApi({
 
                     if (data.features && data.features.length > 0) {
                         // La dirección más relevante suele ser el primer resultado
-                        const address = data.features[0].place_name;
+                        console.log(data.features[0]);
+                        console.log(data.features[0].address);
+                        /* console.log(data.features[0].properties); */
+                        const address = `${data.features[0].text} ${data.features[0].address}`;
                         return { data: { address } }; // RTK Query espera un objeto { data: ... }
                     } else {
                         return { data: { address: 'Dirección no encontrada' } };
