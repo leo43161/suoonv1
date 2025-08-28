@@ -7,7 +7,7 @@ export const searchSlice = createSlice({
         destinationAddress: "",
         originSearchAddress: "",
         destinationSearchAddress: "",
-        indexBottomSheet: -1
+        indexBottomSheet: 1
     },
     reducers: {
         setOriginAddress: (state, action) => {

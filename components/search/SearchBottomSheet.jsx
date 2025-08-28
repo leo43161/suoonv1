@@ -8,7 +8,7 @@ import { setDestinationAddress, setOriginAddress, setDestinationSearchAddress, s
 import { useDispatch, useSelector } from 'react-redux';
 
 // Añadimos la prop 'activeInput'
-const SearchBottomSheet = forwardRef(({ index, onChange, activeInput }, ref) => {
+const SearchBottomSheet = forwardRef(({ index, onChange, activeInput, setSheetIndex }, ref) => {
     const dispatch = useDispatch();
     const { originSearchAddress, destinationSearchAddress, destinationAddress } = useSelector((state) => state.searchReducer);
     const snapPoints = useMemo(() => ['60%', '90%'], []);
@@ -128,7 +128,7 @@ const SearchBottomSheet = forwardRef(({ index, onChange, activeInput }, ref) => 
                         }
                     </View>
                     <View>
-                        <SearchResult inputFocus={onFocusInput} handleInput={handleInput} />
+                        <SearchResult bottomSheetRef={ref} inputFocus={onFocusInput} handleInput={handleInput} />
                     </View>
                 </View>
             </BottomSheetView>

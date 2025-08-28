@@ -4,13 +4,13 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { formatAddress } from '../../utilities/search';
 import { MAPBOX_API_TOKEN } from '../../constants/config';
-import { setDestinationAddress, setOriginAddress, setDestinationSearchAddress, setOriginSearchAddress } from '../../features/map/searchSlice';
+import { setDestinationAddress, setOriginAddress, setDestinationSearchAddress, setOriginSearchAddress, setBottomSheetIndex } from '../../features/map/searchSlice';
 import Card from '../common/Card'
 import { colors } from '../../global/colors';
 import { setDestination, setOrigin } from '../../features/map/mapSlice';
 
 
-const SearchResult = ({ inputFocus, handleInput, onModalOpen }) => {
+const SearchResult = ({ inputFocus, handleInput, bottomSheetRef }) => {
     const dispatch = useDispatch();
     const [searchResults, setSearchResults] = useState([]);
     const [isLoadingData, setIsLoadingData] = useState(false);
@@ -25,10 +25,12 @@ const SearchResult = ({ inputFocus, handleInput, onModalOpen }) => {
     useEffect(() => {
         let timer;
         const keyword = inputFocus === 'origen' ? originSearchAddress : destinationSearchAddress;
-        console.log(keyword)
+        console.log("DEBUG TRIM()");
+        console.log(inputFocus);
+        console.log(originSearchAddress);
+        console.log(destinationSearchAddress);
+        console.log(keyword);
         const searchWithDelay = async () => {
-            console.log("Explorando error Trim 1");
-            console.log(keyword);
             // Si la palabra clave no está vacía
             if (keyword.trim() !== '') {
                 setIsLoadingData(true);
@@ -55,8 +57,6 @@ const SearchResult = ({ inputFocus, handleInput, onModalOpen }) => {
             clearTimeout(timer);
             timer = setTimeout(searchWithDelay, 3000); // 3 segundos de retraso
         };
-        console.log("Explorando error Trim 2");
-        console.log(keyword);
 
         if (keyword.trim() !== '') {
             delayedSearch();
@@ -72,8 +72,6 @@ const SearchResult = ({ inputFocus, handleInput, onModalOpen }) => {
     const handleResults = async (result, filter = false) => {
         if (result.feature_type === 'street' && filter) {
             const place = result.context.place.name;
-            console.log("Explorando error Trim 3");
-            console.log(place);
             const street = result.context.street.name.replace(place, '').trim();
             handleInput(`${street}, `, street.length + 2);
             return;
@@ -82,11 +80,23 @@ const SearchResult = ({ inputFocus, handleInput, onModalOpen }) => {
             const apiUrl = `https://api.mapbox.com/search/searchbox/v1/retrieve/${result.mapbox_id}?session_token=${sessionKey}&access_token=${apiToken}`;
             const response = await fetch(apiUrl);
             const data = await response.json();
+            console.log("DEBUG TRIM() - 2");
+            console.log(data);
+            console.log(data);
+            console.log("--------------------------- result -----------------------------------------");
+            console.log(result);
+            console.log("--------------------------- result.feature_type -----------------------------------------");
+            console.log(result.feature_type);
+            console.log("--------------------------- data.features[0] -----------------------------------------");
+            console.log(data.features[0]);
+            console.log("--------------------------- data.features[0].properties -----------------------------------------");
+            console.log(data.features[0].properties);
             const address = result.feature_type === 'street' ?
                 `${data.features[0].properties.context.street.name}, ${data.features[0].properties.context.place.name}`
                 :
-                data.features[0].properties.address;
+                (data.features[0].properties.address || data.features[0].properties.name || 'Dirección no encontrada');
             const [longitude, latitude] = data.features[0].geometry.coordinates;
+
             if (inputFocus === 'origen') {
                 dispatch(setOriginAddress(address));
                 dispatch(setOriginSearchAddress(address));
@@ -96,6 +106,7 @@ const SearchResult = ({ inputFocus, handleInput, onModalOpen }) => {
                 dispatch(setDestinationSearchAddress(address));
                 dispatch(setDestination({ latitude, longitude }));
             }
+            bottomSheetRef.current.close();
         } catch (error) {
             console.error('Error al buscar la ubicación:', error);
             setIsLoadingData(false);

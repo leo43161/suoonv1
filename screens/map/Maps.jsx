@@ -196,6 +196,7 @@ const Maps = ({ route }) => {
         index={sheetIndex}
         onChange={handleSheetChanges}
         activeInput={activeInput}
+        setSheetIndex={setSheetIndex}
       />
     </View>
   );
