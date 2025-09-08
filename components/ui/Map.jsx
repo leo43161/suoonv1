@@ -1,10 +1,11 @@
 import React, { forwardRef } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Polyline, Marker } from 'react-native-maps';
 import { colors } from '../../global/colors';
+import { FontAwesome5 } from '@expo/vector-icons';
 
 // Envolvemos el componente con forwardRef
-const Map = forwardRef(({ region, origin, ...props }, ref) => {
+const Map = forwardRef(({ region, origin, busPositions = [], ...props }, ref) => {
   return (
     <MapView
       ref={ref} // La ref se asigna aquí
@@ -23,6 +24,31 @@ const Map = forwardRef(({ region, origin, ...props }, ref) => {
           strokeWidth={4}
         />
       )}
+      {/* Marcadores de colectivos en tiempo real */}
+      {busPositions && busPositions.map((position, index) => (
+        <Marker
+          key={`bus-${position.deviceId}-${index}`}
+          coordinate={{
+            latitude: position.latitude,
+            longitude: position.longitude
+          }}
+          title={`Bus ${position.numeroInterno}`}
+          description={`Patente: ${position.patente}`}
+          pinColor={colors.accent}
+        >
+          <View style={{
+            alignItems: 'center',
+            padding: 3,
+            borderColor:
+              colors.dark,
+            borderWidth: 2,
+            borderRadius: 10,
+            backgroundColor: 'white',
+          }}>
+            <FontAwesome5 name={'bus'} size={17} color={colors.dark} />
+          </View>
+        </Marker>
+      ))}
       {props.matchedSegmentCoords && props.matchedSegmentCoords.length > 0 && (
         <Polyline
           coordinates={props.matchedSegmentCoords}

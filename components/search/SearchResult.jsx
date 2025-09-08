@@ -24,12 +24,7 @@ const SearchResult = ({ inputFocus, handleInput, bottomSheetRef }) => {
 
     useEffect(() => {
         let timer;
-        const keyword = inputFocus === 'origen' ? originSearchAddress : destinationSearchAddress;
-        console.log("DEBUG TRIM()");
-        console.log(inputFocus);
-        console.log(originSearchAddress);
-        console.log(destinationSearchAddress);
-        console.log(keyword);
+        const keyword = inputFocus === 'origin' ? originSearchAddress : destinationSearchAddress;
         const searchWithDelay = async () => {
             // Si la palabra clave no está vacía
             if (keyword.trim() !== '') {
@@ -80,24 +75,12 @@ const SearchResult = ({ inputFocus, handleInput, bottomSheetRef }) => {
             const apiUrl = `https://api.mapbox.com/search/searchbox/v1/retrieve/${result.mapbox_id}?session_token=${sessionKey}&access_token=${apiToken}`;
             const response = await fetch(apiUrl);
             const data = await response.json();
-            console.log("DEBUG TRIM() - 2");
-            console.log(data);
-            console.log(data);
-            console.log("--------------------------- result -----------------------------------------");
-            console.log(result);
-            console.log("--------------------------- result.feature_type -----------------------------------------");
-            console.log(result.feature_type);
-            console.log("--------------------------- data.features[0] -----------------------------------------");
-            console.log(data.features[0]);
-            console.log("--------------------------- data.features[0].properties -----------------------------------------");
-            console.log(data.features[0].properties);
             const address = result.feature_type === 'street' ?
                 `${data.features[0].properties.context.street.name}, ${data.features[0].properties.context.place.name}`
                 :
                 (data.features[0].properties.address || data.features[0].properties.name || 'Dirección no encontrada');
             const [longitude, latitude] = data.features[0].geometry.coordinates;
-
-            if (inputFocus === 'origen') {
+            if (inputFocus === 'origin') {
                 dispatch(setOriginAddress(address));
                 dispatch(setOriginSearchAddress(address));
                 dispatch(setOrigin({ latitude, longitude }));

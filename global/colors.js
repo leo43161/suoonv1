@@ -4,5 +4,6 @@ export const colors = {
     accent: "#E5D283",   // Mantengo accent, podríamos ajustar si no se usa mucho.
     background: "#F0F0F0",
     light: "#E4ECED", // Nuevo color
-    dark: "#1D1D1B"  // Nuevo color
+    dark: "#1D1D1B",  // Nuevo color
+    busMarker: "#FF6B6B"
 }

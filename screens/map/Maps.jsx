@@ -5,10 +5,10 @@ import { useSelector, useDispatch } from 'react-redux';
 
 // Acciones de Redux
 import { setOrigin, setDestination, setBusesCoords } from '../../features/map/mapSlice';
-import { setBusSelected } from '../../features/buses/busesSlice';
+import { setBusSelected, setBusPositions } from '../../features/buses/busesSlice';
 
 // RTK Query Hook
-import { useGetRecorridoByCoordsQuery, useReverseGeocodeMutation } from '../../services/api/busesApi';
+import { useGetRecorridoByCoordsQuery, useReverseGeocodeMutation, useGetBusPositionsQuery } from '../../services/api/busesApi';
 
 // Componentes de UI
 import Map from '../../components/ui/Map';
@@ -33,7 +33,7 @@ const Maps = ({ route }) => {
 
   // --- LECTURA DEL ESTADO DE REDUX ---
   const { origin, destination, center, zoom, busesCoords } = useSelector((state) => state.mapReducer);
-  const { busSelected } = useSelector((state) => state.busesReducer);
+  const { busSelected, busPositions } = useSelector((state) => state.busesReducer);
 
   // --- LÓGICA DE BÚSQUEDA CON RTK QUERY ---
   const {
@@ -44,6 +44,20 @@ const Maps = ({ route }) => {
     { origin, destination },
     { skip: !origin || !destination, refetchOnMountOrArgChange: true }
   );
+
+  // Query para obtener posiciones de colectivos en tiempo real
+  const {
+    data: busPositionsData,
+    isLoading: isLoadingPositions
+  } = useGetBusPositionsQuery(
+    { cod: busSelected?.cod },
+    {
+      skip: !busSelected?.cod,
+      pollingInterval: 30000, // Actualizar cada 30 segundos
+      refetchOnMountOrArgChange: true
+    }
+  );
+
 
   // --- NUEVO EFECTO PARA OBTENER LA UBICACIÓN INICIAL ---
   useEffect(() => {
@@ -90,12 +104,22 @@ const Maps = ({ route }) => {
     }
   }, [matchedSegmentCoords]);
 
+  // Efecto para actualizar las posiciones de los colectivos
+  useEffect(() => {
+    if (busPositionsData) {
+      dispatch(setBusPositions(busPositionsData));
+    } else {
+      dispatch(setBusPositions([]));
+    }
+  }, [busPositionsData, dispatch]);
+
   useEffect(() => {
     if (matchedBuses && matchedBuses.length > 0 && !busSelected) {
       handleSelectBus(matchedBuses[0]);
     } else if (matchedBuses && matchedBuses.length === 0) {
       dispatch(setBusesCoords([]));
       dispatch(setBusSelected(null));
+      dispatch(setBusPositions([]));
     }
   }, [matchedBuses, busSelected, dispatch, origin, destination]);
 
@@ -163,6 +187,7 @@ const Maps = ({ route }) => {
         region={region}
         origin={origin}
         destination={destination}
+        busPositions={busPositionsData}
         fullRouteCoords={busesCoords}
         matchedSegmentCoords={matchedSegmentCoords}
         onOriginDragEnd={handleOriginDragEnd}

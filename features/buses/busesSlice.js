@@ -21,6 +21,7 @@ export const busesSlice = createSlice({
             startIndex: -1,
             endIndex: -1,
         },
+        busPositions: [],
     },
     reducers: {
         setBusSelected: (state, action) => {
@@ -79,9 +80,13 @@ export const busesSlice = createSlice({
             state.recorrido = {};
             state.matchedSegment.startIndex = -1;
             state.matchedSegment.endIndex = -1;
-        }
+            state.busPositions = [];
+        },
+        setBusPositions: (state, action) => {
+            state.busPositions = action.payload;
+        },
     }
 })
 
-export const { setBusSelected, setBusesMatch, setRecorrido, resetMapsState } = busesSlice.actions;
+export const { setBusSelected, setBusesMatch, setRecorrido, resetMapsState, setBusPositions } = busesSlice.actions;
 export default busesSlice.reducer;

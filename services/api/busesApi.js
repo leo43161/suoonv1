@@ -116,14 +116,14 @@ export const busesApi = createApi({
                     console.error('Mapbox API token no está configurado.');
                     return { error: 'Mapbox API token not configured' };
                 }
-                
+
                 // Construimos la URL para la API de Geocodificación de Mapbox
                 const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?language=es&access_token=${apiToken}`;
 
                 try {
                     const response = await fetch(url);
                     if (!response.ok) throw new Error('Error en la respuesta de la API de Mapbox');
-                    
+
                     const data = await response.json();
 
                     if (data.features && data.features.length > 0) {
@@ -139,7 +139,35 @@ export const busesApi = createApi({
                 }
             }
         }),
+        getBusPositions: builder.query({
+            queryFn: async ({ cod }) => {
+                if (!cod) return { data: [] };
+
+                try {
+                    const response = await fetch(`https://tucubondismt.gob.ar/api/v3/ramales/${cod}/posiciones?key=d11b94cfc9c28e7af3d2e801768e3a6f3951188a`);
+                    if (!response.ok) throw new Error('Error fetching bus positions');
+
+                    const data = await response.json();
+
+                    const positions = data.ultimas_posiciones?.map(pos => ({
+                        latitude: parseFloat(pos.lat),
+                        longitude: parseFloat(pos.lng),
+                        patente: pos.patente,
+                        numeroInterno: pos.numero_interno,
+                        angulo: pos.angulo,
+                        reportedAt: pos.reported_at,
+                        deviceId: pos.device_id
+                    })) || [];
+
+                    return { data: positions };
+                } catch (error) {
+                    console.error('Error fetching bus positions:', error);
+                    return { error: error.message };
+                }
+            },
+            keepUnusedDataFor: 30, // Cache por 30 segundos para datos en tiempo real
+        })
     }),
 });
 
-export const { useGetRecorridoByCoordsQuery, useReverseGeocodeMutation } = busesApi;
+export const { useGetRecorridoByCoordsQuery, useReverseGeocodeMutation, useGetBusPositionsQuery } = busesApi;
