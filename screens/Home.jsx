@@ -86,7 +86,7 @@ export default Home;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.dark,
     },
     header: {
         paddingTop: 20,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: colors.dark,
+        color: colors.light,
     },
     searchBar: {
         marginHorizontal: 15,
@@ -105,23 +105,26 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         paddingVertical: 12,
-        borderRadius: 25,
+        borderRadius: 15,
         backgroundColor: colors.light, // Puedes ajustar el color de fondo de la barra de búsqueda
     },
     searchInputPlaceholder: {
-        fontSize: 18,
-        color: colors.dark,
+        fontSize: 24,
+        color: "#646464",
         flex: 1,
         textAlign: 'center',
+        fontWeight: 'semibold',
+        fontStyle: 'italic',
     },
     searchInputTouchable: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        paddingStart: 15,
     },
     sectionTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: colors.dark,
+        color: colors.light,
         marginTop: 20,
         marginBottom: 10,
         marginLeft: 15,

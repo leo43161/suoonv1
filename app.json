@@ -38,7 +38,44 @@
       }
     },
     "plugins": [
-      "expo-location"
+      "expo-location",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Sora/Sora.ttf"
+          ],
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "Sora",
+                "fontDefinitions": [
+                  {
+                    "path": "./assets/fonts/Sora/Sora-ExtraBold.ttf",
+                    "weight": 800
+                  },
+                  {
+                    "path": "./assets/fonts/Sora/Sora-Bold.ttf",
+                    "weight": 700
+                  },
+                  {
+                    "path": "./assets/fonts/Sora/Sora-Medium.ttf",
+                    "weight": 500
+                  },
+                  {
+                    "path": "./assets/fonts/Sora/Sora-Regular.ttf",
+                    "weight": 400
+                  },
+                  {
+                    "path": "./assets/fonts/Sora/Sora-Light.ttf",
+                    "weight": 300
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
     ],
     "owner": "leo43"
   }
