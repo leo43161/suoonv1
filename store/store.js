@@ -4,6 +4,7 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 
 import mapReducer from '../features/map/mapSlice';
+import searchReducer from '../features/map/searchSlice';
 import busesReducer from '../features/buses/busesSlice';
 import likesReducer from '../features/likes/likesSlice';
 import { busesApi } from "../services/api/busesApi";
@@ -16,6 +17,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
     mapReducer,
+    searchReducer,
     busesReducer,
     likesReducer,
     [busesApi.reducerPath]: busesApi.reducer,

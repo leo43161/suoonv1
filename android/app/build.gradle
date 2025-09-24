@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.leo43.bustuc'
+    namespace 'com.suoon.app'
     defaultConfig {
-        applicationId 'com.leo43.bustuc'
+        applicationId 'com.suoon.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

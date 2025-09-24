@@ -1,5 +1,4 @@
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
-import React from 'react';
 import { colors } from '../global/colors';
 import Card from '../components/common/Card';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -42,7 +41,7 @@ const Home = () => {
             </Card>
 
             {/* Título "Encuentra" con card outline */}
-            <View style={styles.findSection}>
+            <TouchableOpacity onPress={onSearchPress} style={styles.findSection}>
                 <Text style={styles.sectionTitle}>Encuentra</Text>
                 <Card additionalStyle={styles.findCard}>
                     <Image
@@ -56,7 +55,7 @@ const Home = () => {
                         </Text>
                     </View>
                 </Card>
-            </View>
+            </TouchableOpacity>
 
             {/* Título "Colectivos populares" y lista de cards */}
             <View style={styles.popularBusesSection}>
@@ -110,18 +109,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 15,
         paddingVertical: 12,
-        borderRadius: 25,
+        borderRadius: 15,
         backgroundColor: colors.light, // Puedes ajustar el color de fondo de la barra de búsqueda
     },
     searchInputPlaceholder: {
-        fontSize: 18,
-        color: colors.dark,
+        fontSize: 24,
+        color: "#646464",
         flex: 1,
         textAlign: 'center',
+        fontWeight: 'semibold',
+        fontStyle: 'italic',
     },
     searchInputTouchable: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: 'flex-start',
+        paddingStart: 15,
     },
     sectionTitle: {
         fontSize: 28,

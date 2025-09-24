@@ -1,4 +1,4 @@
-package com.leo43.bustuc
+package com.suoon.app
 
 import android.os.Build
 import android.os.Bundle

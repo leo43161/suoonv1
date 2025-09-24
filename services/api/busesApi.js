@@ -1,106 +1,173 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { TUCUBUS_API_URL } from '../../constants/config'; // Aunque no se usará directamente para las rutas, se mantiene la configuración base.
-import allBusesData from '../../data/Buses.json'; // Importa tus datos de Buses.json directamente
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import busesData from '../../data/Buses.json';
 
-// Función para calcular distancia (la misma que ya tenías)
-const getDistance = (lat1, lon1, lat2, lon2, unit) => {
-    if ((lat1 === lat2) && (lon1 === lon2)) {
-        return 0;
-    }
-    else {
-        const radlat1 = Math.PI * lat1 / 180;
-        const radlat2 = Math.PI * lat2 / 180;
-        const theta = lon1 - lon2;
-        const radtheta = Math.PI * theta / 180;
-        let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-        if (dist > 1) {
-            dist = 1;
-        }
-        dist = Math.acos(dist);
-        dist = dist * 180 / Math.PI;
-        dist = dist * 60 * 1.1515;
-        if (unit === "K") { dist = dist * 1.609344; }
-        if (unit === "N") { dist = dist * 0.8684; }
-        return dist;
-    }
-}
+// --- Helper Functions (Lógica extraída y adaptada de index.js) ---
+
+/**
+ * Calcula la distancia en kilómetros entre dos coordenadas usando la fórmula de Haversine.
+ * @param {object} p1 - Punto 1 con { latitude, longitude }.
+ * @param {object} p2 - Punto 2 con { latitude, longitude }.
+ * @returns {number} - Distancia en kilómetros.
+ */
+const getDistanceInKm = (p1, p2) => {
+    if (!p1 || !p2) return Infinity;
+    const R = 6371; // Radio de la Tierra en km
+    const dLat = (p2.latitude - p1.latitude) * (Math.PI / 180);
+    const dLon = (p2.longitude - p1.longitude) * (Math.PI / 180);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(p1.latitude * (Math.PI / 180)) * Math.cos(p2.latitude * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+};
+
 
 export const busesApi = createApi({
     reducerPath: "busesApi",
-    // BaseQuery puede ser un dummy o simplemente mantenerse si otras partes de la API real se usarán.
-    // Para estas dos consultas, usaremos `queryFn` para sobrescribir el comportamiento.
-    baseQuery: fetchBaseQuery({ baseUrl: TUCUBUS_API_URL }),
+    baseQuery: fetchBaseQuery({ baseUrl: "" }), // No necesitamos una URL base para lógica local
     endpoints: (builder) => ({
         getRecorridoByCoords: builder.query({
-            // Usamos queryFn para devolver los datos locales directamente
-            queryFn: ({ origin, destination }) => {
-                let matchedBuses = [];
-                const allRecorridos = allBusesData; // Usamos los datos importados
+            /**
+             * QueryFn que ejecuta la lógica de búsqueda de colectivos localmente.
+             * No realiza una llamada de red.
+             */
+            queryFn: ({ origin, destination, radio = 0.8 }) => {
+                if (!origin || !destination) {
+                    return { data: [] }; // Si no hay origen/destino, no hay resultados.
+                }
 
-                for (const recorrido of allRecorridos) {
-                    if (!Array.isArray(recorrido.nodos) || recorrido.nodos.length < 2) {
-                        continue;
-                    }
+                const matchedBuses = [];
 
-                    let startIndex = -1;
-                    let endIndex = -1;
-                    const PROXIMITY_THRESHOLD_KM = 0.5; // Umbral de 0.5 km para considerar una "parada" cercana
+                // 1. Iterar sobre todas las líneas de colectivo
+                for (const bus of busesData) {
+                    const paradasOrigenCercanas = [];
+                    const paradasDestinoCercanas = [];
 
-                    // Encontrar el nodo más cercano al origen
-                    for (let i = 0; i < recorrido.nodos.length; i++) {
-                        const node = recorrido.nodos[i];
-                        if (!Array.isArray(node) || node.length !== 2 || typeof node[0] !== 'number' || typeof node[1] !== 'number') {
-                            console.warn("Coordenada inválida en recorrido para cod:", recorrido.cod, node);
-                            continue;
+                    // 2. Encontrar todos los nodos cercanos al origen y al destino
+                    bus.nodos.reverse().forEach((nodo, index) => {
+                        const punto = { latitude: nodo[0], longitude: nodo[1] };
+                        if (getDistanceInKm(origin, punto) <= radio) {
+                            paradasOrigenCercanas.push({ index, punto });
                         }
-                        const distToOrigin = getDistance(node[0], node[1], origin.latitude, origin.longitude, "K");
-                        if (distToOrigin < PROXIMITY_THRESHOLD_KM) {
-                            startIndex = i;
-                            break;
+                        if (getDistanceInKm(destination, punto) <= radio) {
+                            paradasDestinoCercanas.push({ index, punto });
                         }
-                    }
+                    });
 
-                    // Si se encontró un posible punto de origen, buscar el destino
-                    if (startIndex !== -1) {
-                        for (let i = startIndex; i < recorrido.nodos.length; i++) {
-                            const node = recorrido.nodos[i];
-                            const distToDestination = getDistance(node[0], node[1], destination.latitude, destination.longitude, "K");
-                            if (distToDestination < PROXIMITY_THRESHOLD_KM) {
-                                endIndex = i;
-                                break;
+                    // 3. Si hay paradas cercanas en AMBOS puntos, es un match potencial
+                    if (paradasOrigenCercanas.length > 0 && paradasDestinoCercanas.length > 0) {
+                        let mejorTramo = {
+                            startIndex: -1,
+                            endIndex: -1,
+                            distanciaMinima: Infinity,
+                            startPoint: null,
+                            endPoint: null,
+                        };
+
+                        // 4. Encontrar el tramo más corto entre las paradas cercanas
+                        for (const paradaOrigen of paradasOrigenCercanas) {
+                            for (const paradaDestino of paradasDestinoCercanas) {
+                                // Asegurarse de que la subida es antes que la bajada
+                                if (paradaOrigen.index < paradaDestino.index) {
+                                    const distanciaTramo = paradaDestino.index - paradaOrigen.index;
+                                    if (distanciaTramo < mejorTramo.distanciaMinima) {
+                                        mejorTramo = {
+                                            startIndex: paradaOrigen.index,
+                                            endIndex: paradaDestino.index,
+                                            distanciaMinima: distanciaTramo,
+                                            startPoint: paradaOrigen.punto,
+                                            endPoint: paradaDestino.punto,
+                                        };
+                                    }
+                                }
+                            }
+                        }
+
+                        // 5. Si se encontró un tramo válido, añadir el colectivo a la lista de matches
+                        if (mejorTramo.startIndex !== -1) {
+                            // --- ¡EL NUEVO CONTROL DE REALIDAD! ---
+                            const distAlDestinoDesdeInicioTramo = getDistanceInKm(mejorTramo.startPoint, destination);
+                            const distAlDestinoDesdeFinTramo = getDistanceInKm(mejorTramo.endPoint, destination);
+                            if (distAlDestinoDesdeFinTramo < distAlDestinoDesdeInicioTramo) {
+                                matchedBuses.push({
+                                    cod: bus.cod,
+                                    linea: bus.linea,
+                                    descripcion: bus.descripcion,
+                                    ramal: bus.ramal,
+                                    nodos: bus.nodos.map(n => ({ latitude: n[0], longitude: n[1] })),
+                                    startIndex: mejorTramo.startIndex,
+                                    endIndex: mejorTramo.endIndex,
+                                });
                             }
                         }
                     }
+                }
 
-                    // Si se encontraron ambos y el destino está después del origen en el recorrido
-                    if (startIndex !== -1 && endIndex !== -1 && endIndex >= startIndex) {
-                        matchedBuses.push({
-                            cod: recorrido.cod,
-                            linea: recorrido.linea, // Asegúrate de que estas propiedades existan en tu Buses.json
-                            descripcion: recorrido.descripcion, // Asegúrate de que estas propiedades existan en tu Buses.json
-                            startIndex: startIndex,
-                            endIndex: endIndex
-                        });
+                // 6. Devolver los colectivos encontrados. RTK Query lo cacheará.
+                return { data: matchedBuses };
+            }
+        }),
+        reverseGeocode: builder.mutation({
+            queryFn: async ({ latitude, longitude }) => {
+                const apiToken = process.env.EXPO_PUBLIC_MAPBOX_API_TOKEN;
+                if (!apiToken) {
+                    console.error('Mapbox API token no está configurado.');
+                    return { error: 'Mapbox API token not configured' };
+                }
+
+                // Construimos la URL para la API de Geocodificación de Mapbox
+                const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?language=es&access_token=${apiToken}`;
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Error en la respuesta de la API de Mapbox');
+
+                    const data = await response.json();
+
+                    if (data.features && data.features.length > 0) {
+                        // La dirección más relevante suele ser el primer resultado
+                        const address = `${data.features[0].text} ${data.features[0].address}`;
+                        return { data: { address } }; // RTK Query espera un objeto { data: ... }
+                    } else {
+                        return { data: { address: 'Dirección no encontrada' } };
                     }
+                } catch (error) {
+                    console.error('Error al realizar la geocodificación inversa:', error);
+                    return { error: error.message };
                 }
-                // Ordenar los buses matcheados (por ejemplo, por la menor distancia del origen al punto de inicio del colectivo)
-                // Aquí podrías refinar el criterio de ordenamiento si lo necesitas, como la distancia al origen del primer nodo encontrado.
-                // Por ahora, simplemente devolveremos los primeros 15 que cumplan.
-                matchedBuses = matchedBuses.slice(0, 15);
-                return { data: matchedBuses }; // RTK Query espera un objeto { data: ... } o { error: ... }
             }
         }),
-        getRecorridoByCod: builder.query({
-            // Usamos queryFn para devolver los datos locales directamente
-            queryFn: (cod) => {
-                const foundBus = allBusesData.find(bus => bus.cod === parseInt(cod));
-                if (foundBus) {
-                    return { data: foundBus };
+        getBusPositions: builder.query({
+            queryFn: async ({ cod }) => {
+                if (!cod) return { data: [] };
+
+                try {
+                    const response = await fetch(`https://tucubondismt.gob.ar/api/v3/ramales/${cod}/posiciones?key=d11b94cfc9c28e7af3d2e801768e3a6f3951188a`);
+                    if (!response.ok) throw new Error('Error fetching bus positions');
+
+                    const data = await response.json();
+
+                    const positions = data.ultimas_posiciones?.map(pos => ({
+                        latitude: parseFloat(pos.lat),
+                        longitude: parseFloat(pos.lng),
+                        patente: pos.patente,
+                        numeroInterno: pos.numero_interno,
+                        angulo: pos.angulo,
+                        reportedAt: pos.reported_at,
+                        deviceId: pos.device_id
+                    })) || [];
+
+                    return { data: positions };
+                } catch (error) {
+                    console.error('Error fetching bus positions:', error);
+                    return { error: error.message };
                 }
-                return { error: { status: 404, data: 'Recorrido no encontrado' } };
-            }
-        }),
-    })
+            },
+            keepUnusedDataFor: 30, // Cache por 30 segundos para datos en tiempo real
+        })
+    }),
 });
 
-export const { useGetRecorridoByCoordsQuery, useGetRecorridoByCodQuery } = busesApi;
+export const { useGetRecorridoByCoordsQuery, useReverseGeocodeMutation, useGetBusPositionsQuery } = busesApi;
