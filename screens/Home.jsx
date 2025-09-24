@@ -26,7 +26,11 @@ const Home = () => {
         <ScrollView style={styles.container}>
             {/* Parte de arriba con título */}
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>SUOON</Text>
+                <Image
+                    source={require('../assets/img/suoon-icon.png')} // Placeholder de imagen de mapa
+                    style={{ width: 80, height: 37, marginBottom: 10 }}
+                />
+                <Text style={styles.headerTitle}>Suoon</Text>
             </View>
 
             {/* Barra de búsqueda */}
@@ -87,7 +91,7 @@ export default Home;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: colors.dark,
     },
     header: {
         paddingTop: 20,
@@ -96,8 +100,8 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 28,
-        fontWeight: 'bold',
-        color: colors.dark,
+        fontWeight: '600',
+        color: colors.light,
     },
     searchBar: {
         marginHorizontal: 15,
@@ -120,12 +124,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     sectionTitle: {
-        fontSize: 22,
+        fontSize: 28,
         fontWeight: 'bold',
-        color: colors.dark,
+        color: colors.light,
         marginTop: 20,
         marginBottom: 10,
-        marginLeft: 15,
     },
     findSection: {
         paddingHorizontal: 15,
