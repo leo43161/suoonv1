@@ -41,9 +41,9 @@ const Map = forwardRef(({ region, origin, busPositions = [], ...props }, ref) =>
             padding: 3,
             borderColor:
               colors.dark,
-            borderWidth: 2,
+            borderWidth: 1,
             borderRadius: 10,
-            backgroundColor: 'white',
+            backgroundColor: colors.light,
           }}>
             <FontAwesome5 name={'bus'} size={17} color={colors.dark} />
           </View>

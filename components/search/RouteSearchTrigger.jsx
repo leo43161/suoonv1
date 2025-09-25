@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
         top: 30,
         left: 20,
         right: 20,
-        backgroundColor: 'white',
+        backgroundColor: colors.light || 'white',
         borderRadius: 15,
         elevation: 5,
         shadowColor: '#000',
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     square: {
         width: 18,
         height: 18,
+        borderRadius: 3,
     },
     destinationCircle: {
         backgroundColor: colors.dark || 'blue',

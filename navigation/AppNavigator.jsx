@@ -17,7 +17,7 @@ const Tab = createBottomTabNavigator();
 // Componente para los íconos de las pestañas
 const TabIcon = ({ focused, icon }) =>
     <View>
-        <FontAwesome5 name={icon} size={24} color={focused ? colors.accent : "white"} />
+        <FontAwesome5 name={icon} size={24} color={focused ? colors.primary : "white"} />
     </View>
 
 const AppNavigator = () => {
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     tabBar: {
         height: 70,
         justifyContent: 'center',
-        backgroundColor: colors.primary,
+        backgroundColor: colors.dark,
         borderTopWidth: 0, // Eliminar la línea superior del tabBar
         elevation: 10, // Sombra para Android
         shadowColor: "#000", // Sombra para iOS
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         paddingVertical: 8
     },
     tabsText: {
-        fontSize: 12,
+        fontSize: 13,
         color: "white"
     },
 });
